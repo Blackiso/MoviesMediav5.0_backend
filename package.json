@@ -1,0 +1,36 @@
+{
+  "name": "moviesmedia-v5.0",
+  "version": "5.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "ts-node-dev --respawn src/index.ts --transpileOnly",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@overnightjs/core": "^1.7.5",
+    "@overnightjs/logger": "^1.2.0",
+    "bcrypt": "^5.0.0",
+    "express": "^4.17.1",
+    "module-alias": "^2.2.2",
+    "mysql": "^2.18.1",
+    "tsyringe": "^4.4.0",
+    "uuid": "^8.3.1"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.9",
+    "ts-node-dev": "^1.0.0",
+    "typescript": "^4.0.5"
+  },
+  "_moduleAliases": {
+    "@Controllers": "src/Controllers",
+    "@Interfaces": "src/Interfaces",
+    "@Models": "src/Models",
+    "@Services": "src/Services",
+    "@Lib": "src/Lib",
+    "@Validator": "src/Validator",
+    "@Helpers": "src/Helpers"
+  }
+}
