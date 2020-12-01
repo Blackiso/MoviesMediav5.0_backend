@@ -1,7 +1,16 @@
 import { injectable } from 'tsyringe';
-import { MysqlDatabase } from '@Lib/index';
+import { MysqlDatabase } from '@Lib/Mysql/index';
 import { BaseModel } from './BaseModel.model';
+import { timePlus } from '@Helpers/index';
 
+export interface User {
+	id:string;
+	username:string;
+	email:string;
+	password?:string;
+	profile_image?:string;
+	register_date?:any;
+}
 
 @injectable()
 export class UserModel extends BaseModel {
@@ -12,11 +21,23 @@ export class UserModel extends BaseModel {
 		super(db, 'users');
 	}
 
-	public get() {
-		this.db.select(['id', 'username'])
-				.where('id', 'black')
-				.where('x >', 5)
-				.execute();
-		return 'yay';
+	public addTokenId(user:any, tokenId:string):Promise<any> {
+		return this.db.insert(['user_id', 'token_id', 'expires'], { 
+			user_id: user.id, 
+			token_id: tokenId,
+			expires: timePlus(10080)
+		}, 'tokens').execute();
 	}
+
+	public removeTokenId(user:any, tokenId:string):Promise<any> {
+		return this.db.delete('tokens')
+					.where('user_id', user.id)
+					.where('token_id', tokenId)
+					.execute();
+	}
+
+	public getUser(id):Promise<User> {
+		return this.find(id);
+	}
+
 }

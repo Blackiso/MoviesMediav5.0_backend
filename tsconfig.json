@@ -20,7 +20,8 @@
             "@Services/*": ["src/Services/*"],
             "@Lib/*": ["src/Lib/*"],
             "@Validator/*": ["src/Validator/*"],
-            "@Helpers/*": ["src/Helpers/*"]
+            "@Helpers/*": ["src/Helpers/*"],
+            "@Middleware/*": ["src/Middleware/*"]
         },
         "esModuleInterop": true,
         "esModuleInterop": true,                  /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */

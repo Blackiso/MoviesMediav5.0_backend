@@ -1,7 +1,7 @@
 import { Server } from '@overnightjs/core';
 import { Logger } from '@overnightjs/logger';
 import { container } from 'tsyringe';
-import { requestLogger, responseSetup } from './Middleware';
+import { requestLogger, responseSetup, jwt } from './Middleware';
 import * as bodyParser from 'body-parser';
 
 //Controllers
@@ -14,6 +14,7 @@ export class ApiServer extends Server {
         this.app.use(responseSetup);
         this.app.use(requestLogger);
         this.app.use(bodyParser.json({ type: '*/*' }));
+        this.app.use(jwt);
         this.app.use(bodyParser.urlencoded({extended: true}));
     }
 

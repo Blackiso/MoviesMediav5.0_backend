@@ -1,4 +1,4 @@
-import { MysqlDatabase, MysqlResult } from '@Lib/index';
+import { MysqlDatabase, MysqlResult } from '@Lib/Mysql/index';
 
 export class BaseModel {
 

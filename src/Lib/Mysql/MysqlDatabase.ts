@@ -1,8 +1,10 @@
+import { singleton } from 'tsyringe';
 import { Database } from '@Interfaces/Database.interface';
 import { MysqlResult } from './MysqlResult';
 import { Logger } from '@overnightjs/logger';
 import * as mysql from 'mysql';
 
+@singleton()
 export class MysqlDatabase implements Database {
 	
 	private table_qr:string;
@@ -52,8 +54,9 @@ export class MysqlDatabase implements Database {
 		return this.query(query);
 	}
 
-	public insert(keys:string[], data:object):MysqlDatabase {
-		this.main_query = 'INSERT INTO '+this.table_qr+' (:keys) VALUES (:values)';
+	public insert(keys:string[], data:object, table?:string):MysqlDatabase {
+		table = table ? table : this.table_qr;
+		this.main_query = 'INSERT INTO '+table+' (:keys) VALUES (:values)';
 		var values:string[] = [];
 		keys.forEach(key => {
 			values.push(mysql.escape(data[key]));
@@ -63,8 +66,9 @@ export class MysqlDatabase implements Database {
 		return this;
 	}
 
-	public update(keys:string[], data:object):MysqlDatabase {
-		this.main_query = 'UPDATE '+this.table_qr+' SET :data';
+	public update(keys:string[], data:object, table?:string):MysqlDatabase {
+		table = table ? table : this.table_qr;
+		this.main_query = 'UPDATE '+table+' SET :data';
 		var values:string[] = [];
 		keys.forEach(key => {
 			values.push(key+' = '+mysql.escape(data[key]));
@@ -74,19 +78,21 @@ export class MysqlDatabase implements Database {
 		return this;
 	}
 
-	public select(x:string[] | string):MysqlDatabase {
+	public select(x:string[] | string, table?:string):MysqlDatabase {
+		table = table ? table : this.table_qr;
 		this.main_query = 'SELECT ';
 		if (Array.isArray(x)) {
 			this.main_query += x.join(',') + ' ';
 		}else {
 			this.main_query += x + ' ';
 		}
-		this.main_query += 'FROM ' + this.table_qr;
+		this.main_query += 'FROM ' + table;
 		return this;
 	}
 
-	public delete():MysqlDatabase {
-		this.main_query = 'DELETE FROM '+ this.table_qr;
+	public delete(table?:string):MysqlDatabase {
+		table = table ? table : this.table_qr;
+		this.main_query = 'DELETE FROM '+ table;
 		return this;
 	}
 

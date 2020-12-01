@@ -31,6 +31,7 @@
     "@Services": "src/Services",
     "@Lib": "src/Lib",
     "@Validator": "src/Validator",
-    "@Helpers": "src/Helpers"
+    "@Helpers": "src/Helpers",
+    "@Middleware": "src/Middleware"
   }
 }

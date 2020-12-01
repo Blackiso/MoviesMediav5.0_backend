@@ -1,40 +1,44 @@
 import { injectable } from 'tsyringe';
 import { Request, Response } from 'express';
-import { Controller, Get, Post, Middleware } from '@overnightjs/core';
+import { Controller, Get, Post, Middleware, ClassErrorMiddleware } from '@overnightjs/core';
 import { Logger } from '@overnightjs/logger';
 import { Validator } from '@Validator/Validator';
 import { idGenerator, passwordEncrypt, passwordVerify } from '@Helpers/index';
-import { JWT } from '@Lib/index';
-
+import { AuthenticationService } from '@Services/index';
+import { errorHanddler, authentication } from '@Middleware/index';
 
 //Models
 import { UserModel } from '@Models/index';
 
 @injectable()
 @Controller('api/v5/authentication')
+@ClassErrorMiddleware(errorHanddler)
 export class AuthenticationController {
 
-	constructor(private validator:Validator, private userModel:UserModel) {}
+	constructor(
+		private validator:Validator, 
+		private userModel:UserModel,
+		private authService:AuthenticationService
+	) {}
 
 	@Post('register')
-	private async register(req:Request, res:Response) {
-
+	private async register(req:Request, res:Response, next:any) {
 		try {
-	
+
 			let data = req.body;
-			
+		
 			if (!this.validator.run('register', data)) {
 				return res.error(this.validator.getErrors());
 			}
 
 			let emailCheck = await this.userModel.findBy('email', data.email);
 			if (emailCheck) {
-				return res.error('Email already used');
+				throw 'Email already used';
 			}
 
 			let usernameCheck = await this.userModel.findBy('username', data.username);
 			if (usernameCheck) {
-				return res.error('Username already used');
+				throw 'Username already used';
 			}
 
 			data.id = idGenerator();
@@ -42,19 +46,15 @@ export class AuthenticationController {
 			data.password = passwordEncrypt(data.password);
 
 			await this.userModel.insert(data);
-			delete data.password;
+			return res.ok(await this.authService.authenticate(data));
 
-			return res.ok(data);
 		}catch(e) {
-			console.log(e);
-			Logger.Err(e.error || e);
-			return res.error(e, e.code);
+			next(e);
 		}
-
 	}
 
 	@Post('login')
-	private async login(req:Request, res:Response) {
+	private async login(req:Request, res:Response, next:any) {
 
 		try {
 	
@@ -66,27 +66,37 @@ export class AuthenticationController {
 			}
 
 			let user = await this.userModel.findBy('username', data.username);
-			if (!user) {
-				return res.error(errorString);
+			if (!user || !passwordVerify(data.password, user.password)) {
+				throw errorString;
 			}
 
-			if (!passwordVerify(data.password, user.password)) {
-				return res.error(errorString);
-			}
+			return res.ok(await this.authService.authenticate(user));
 
-			delete user.password;
-			return res.ok(user);
 		}catch(e) {
-			console.log(e);
-			Logger.Err(e.error || e);
-			return res.error(e, e.code);
+			next(e);
 		}
 
 	}
 
-	@Get('test')
-	private test(req:Request, res:Response) {
-		let response = { x: this.userModel.get() };
-		return res.status(200).send(response);
+	@Post('token/renew')
+	private async renew(req:Request, res:Response) {
+
 	}
+
+	@Get('authenticate')
+	@Middleware(authentication)
+	private async authenticate(req:Request, res:Response, next:any) {
+		try {
+			
+			let user = await this.userModel.getUser(req.user.id);
+			delete user.password;
+			delete user.register_date;
+			return res.ok(user);
+
+		}catch(e) {
+			next(e);
+		}
+	}
+
+
 }
