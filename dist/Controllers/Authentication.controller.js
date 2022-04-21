@@ -48,9 +48,9 @@ let AuthenticationController = class AuthenticationController {
                 if (is_validUsername) {
                     throw new index_4.RequestError(index_4.ERRORS.AUTH_USERNAME_USED, 400);
                 }
-                requestBody.id = index_1.idGenerator();
+                requestBody.id = (0, index_1.idGenerator)();
                 requestBody.profile_image = index_4.DEFAULT_IMAGE;
-                requestBody.password = index_1.passwordEncrypt(requestBody.password);
+                requestBody.password = (0, index_1.passwordEncrypt)(requestBody.password);
                 yield this.userModel.insert(requestBody);
                 return res.ok(yield this.authService.authenticate(requestBody));
             }
@@ -67,7 +67,7 @@ let AuthenticationController = class AuthenticationController {
                     return res.error(this.validator.getErrors(), 400);
                 }
                 let user = yield this.userModel.findBy('username', data.username);
-                if (!user || !index_1.passwordVerify(data.password, user.password)) {
+                if (!user || !(0, index_1.passwordVerify)(data.password, user.password)) {
                     throw new index_4.RequestError(index_4.ERRORS.AUTH_LOGIN, 400);
                 }
                 return res.ok(yield this.authService.authenticate(user));
@@ -96,36 +96,37 @@ let AuthenticationController = class AuthenticationController {
     }
 };
 __decorate([
-    core_1.Post('register'),
+    (0, core_1.Post)('register'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, Object, Object]),
     __metadata("design:returntype", Promise)
 ], AuthenticationController.prototype, "register", null);
 __decorate([
-    core_1.Post('login'),
+    (0, core_1.Post)('login'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, Object, Object]),
     __metadata("design:returntype", Promise)
 ], AuthenticationController.prototype, "login", null);
 __decorate([
-    core_1.Post('token/renew'),
+    (0, core_1.Post)('token/renew'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], AuthenticationController.prototype, "renew", null);
 __decorate([
-    core_1.Get('authenticate'),
-    core_1.Middleware(index_3.authentication),
+    (0, core_1.Get)('authenticate'),
+    (0, core_1.Middleware)(index_3.authentication),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, Object, Object]),
     __metadata("design:returntype", Promise)
 ], AuthenticationController.prototype, "authenticate", null);
 AuthenticationController = __decorate([
-    tsyringe_1.injectable(),
-    core_1.Controller('api/v5/authentication'),
-    core_1.ClassErrorMiddleware(index_3.errorHanddler),
+    (0, tsyringe_1.injectable)(),
+    (0, core_1.Controller)('api/v5/authentication'),
+    (0, core_1.ClassErrorMiddleware)(index_3.errorHanddler),
     __metadata("design:paramtypes", [Validator_1.Validator,
         index_5.UserModel,
         index_2.AuthenticationService])
 ], AuthenticationController);
 exports.AuthenticationController = AuthenticationController;
+//# sourceMappingURL=Authentication.controller.js.map

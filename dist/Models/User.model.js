@@ -26,7 +26,7 @@ let UserModel = class UserModel extends BaseModel_model_1.BaseModel {
         return this.db.insert(['user_id', 'token_id', 'expires'], {
             user_id: user.id,
             token_id: tokenId,
-            expires: index_2.timePlus(10080)
+            expires: (0, index_2.timePlus)(10080)
         }, 'tokens').execute();
     }
     removeTokenId(user, tokenId) {
@@ -40,8 +40,9 @@ let UserModel = class UserModel extends BaseModel_model_1.BaseModel {
     }
 };
 UserModel = __decorate([
-    tsyringe_1.injectable(),
-    __param(0, tsyringe_1.inject(tsyringe_1.delay(() => index_1.MysqlDatabase))),
+    (0, tsyringe_1.injectable)(),
+    __param(0, (0, tsyringe_1.inject)((0, tsyringe_1.delay)(() => index_1.MysqlDatabase))),
     __metadata("design:paramtypes", [index_1.MysqlDatabase])
 ], UserModel);
 exports.UserModel = UserModel;
+//# sourceMappingURL=User.model.js.map

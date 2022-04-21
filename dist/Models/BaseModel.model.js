@@ -49,3 +49,4 @@ class BaseModel {
     }
 }
 exports.BaseModel = BaseModel;
+//# sourceMappingURL=BaseModel.model.js.map
