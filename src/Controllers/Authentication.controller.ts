@@ -100,5 +100,18 @@ export class AuthenticationController {
 		
 	}
 
+	@Get('test')
+	private async test(req:Request, res:Response, next:any) {
+
+		try {
+
+			return res.ok({ test: true });
+
+		}catch(e:any) {
+			next(e.message);
+		}
+		
+	}
+
 
 }

@@ -8,7 +8,6 @@ import { ERRORS, RequestError } from '@Config/index';
 
 export let requestLogger = function (req:Request, res:Response, next:any) {
 	Logger.Info('['+req.method+'] '+req.path);
-	
 	next();
 }
 
