@@ -5,11 +5,13 @@ export interface Rule {
 		max:number,
 		min:number
 	};
+	reg?:string,
 	type?:string,
 	errors:{
 		required?:string,
 		length?:string,
-		type?:string
+		type?:string,
+		reg?:string
 	}
 }
 
@@ -23,11 +25,11 @@ export let RULES = {
 				max: 20,
 				min: 5
 			},
-			type: 'aZ09-_',
+			reg: 'aZ09-_',
 			errors: {
 				required: 'Username is required!',
 				length: 'Username length should be max 20 min 5.',
-				type: 'Invalid username use alphabets, numbers, dash and underscore only.'
+				reg: 'Invalid username use alphabets, numbers, dash and underscore only.'
 			} 
 		},
 		{
@@ -37,6 +39,7 @@ export let RULES = {
 				max: 50,
 				min: 5
 			},
+			type: 'string',
 			errors: {
 				required: 'Password is required!',
 				length: 'Password length should be max 50 min 5.'
@@ -45,10 +48,10 @@ export let RULES = {
 		{
 			name: 'email',
 			required: true,
-			type: 'email',
+			reg: 'email',
 			errors: {
 				required: 'Email is required!',
-				type: 'Invalid email, please enter a valid email.'
+				reg: 'Invalid email, please enter a valid email.'
 			}
 		}
 	],
@@ -67,11 +70,39 @@ export let RULES = {
 				required: 'Password is required!'
 			}
 		}
+	],
+	collection_add: [
+		{
+			name: 'id',
+			required: true,
+			type: 'number',
+			errors: {
+				required: 'ID is required!'
+			}
+		},
+		{
+			name: 'watched',
+			required: true,
+			type: 'boolean',
+			errors: {
+				required: 'watched feild is required!',
+				type: 'invalid type!'
+			}
+		},
+		{
+			name: 'watchlist',
+			required: true,
+			type: 'boolean',
+			errors: {
+				required: 'watchlist feild is required!',
+				type: 'invalid type!'
+			}
+		}
 	]
 
 }
 
-export let TYPES = {
+export let REGEX = {
 	'aZ09-_': /^[a-zA-Z0-9-_]+$/,
 	'email': /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
 }

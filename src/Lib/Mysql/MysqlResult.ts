@@ -8,6 +8,11 @@ export class MysqlResult {
 		return this.result[0] == undefined ? null : this.result[0];
 	}
 
+	public results(object:any = null):Array<any> {
+		if(object) return this.result.map(x => new object(x));
+		return this.result;
+	}
+
 	public count():number {
 		return 0; 	
 	}

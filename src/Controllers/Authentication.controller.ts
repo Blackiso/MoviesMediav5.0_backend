@@ -6,6 +6,7 @@ import { Validator } from '@Validator/Validator';
 import { idGenerator, passwordEncrypt, passwordVerify } from '@Helpers/index';
 import { AuthenticationService } from '@Services/index';
 import { errorHanddler, authentication } from '@Middleware/index';
+import { ERRORS, DEFAULT_IMAGE, RequestError } from '@Config/index';
 
 //Models
 import { UserModel } from '@Models/index';
@@ -25,31 +26,31 @@ export class AuthenticationController {
 	private async register(req:Request, res:Response, next:any) {
 		try {
 
-			let data = req.body;
+			let requestBody = req.body;
 		
-			if (!this.validator.run('register', data)) {
-				return res.error(this.validator.getErrors());
+			if (!this.validator.run('register', requestBody)) {
+				return res.error(this.validator.getErrors(), 400);
 			}
 
-			let emailCheck = await this.userModel.findBy('email', data.email);
-			if (emailCheck) {
-				throw 'Email already used';
+			let is_validEmail = await this.userModel.findBy('email', requestBody.email);
+			if (is_validEmail) {
+				throw new RequestError(ERRORS.AUTH_EMAIL_USED, 400);
 			}
 
-			let usernameCheck = await this.userModel.findBy('username', data.username);
-			if (usernameCheck) {
-				throw 'Username already used';
+			let is_validUsername = await this.userModel.findBy('username', requestBody.username);
+			if (is_validUsername) {
+				throw new RequestError(ERRORS.AUTH_USERNAME_USED, 400);
 			}
 
-			data.id = idGenerator();
-			data.profile_image = 'default.png';
-			data.password = passwordEncrypt(data.password);
+			requestBody.id = idGenerator();
+			requestBody.profile_image = DEFAULT_IMAGE;
+			requestBody.password = passwordEncrypt(requestBody.password);
 
-			await this.userModel.insert(data);
-			return res.ok(await this.authService.authenticate(data));
+			await this.userModel.insert(requestBody);
+			return res.ok(await this.authService.authenticate(requestBody));
 
-		}catch(e) {
-			next(e);
+		}catch(e:any) {
+			next(e.message);
 		}
 	}
 
@@ -59,21 +60,20 @@ export class AuthenticationController {
 		try {
 	
 			let data = req.body;
-			let errorString = 'Wrong username or password!';
 			
 			if (!this.validator.run('login', data)) {
-				return res.error(this.validator.getErrors());
+				return res.error(this.validator.getErrors(), 400);
 			}
 
 			let user = await this.userModel.findBy('username', data.username);
 			if (!user || !passwordVerify(data.password, user.password)) {
-				throw errorString;
+				throw new RequestError(ERRORS.AUTH_LOGIN, 400);
 			}
 
 			return res.ok(await this.authService.authenticate(user));
 
-		}catch(e) {
-			next(e);
+		}catch(e:any) {
+			next(e.message);
 		}
 
 	}
@@ -86,6 +86,7 @@ export class AuthenticationController {
 	@Get('authenticate')
 	@Middleware(authentication)
 	private async authenticate(req:Request, res:Response, next:any) {
+
 		try {
 			
 			let user = await this.userModel.getUser(req.user.id);
@@ -93,9 +94,10 @@ export class AuthenticationController {
 			delete user.register_date;
 			return res.ok(user);
 
-		}catch(e) {
-			next(e);
+		}catch(e:any) {
+			next(e.message);
 		}
+		
 	}
 
 

@@ -1,5 +1,6 @@
+import { ERRORS } from '@Config/index';
 import { injectable, singleton } from 'tsyringe';
-import { RULES, TYPES, Rule } from './validation.rules';
+import { RULES, REGEX, Rule } from './validation.rules';
 
 @singleton()
 @injectable()
@@ -26,28 +27,36 @@ export class Validator {
 		this.rule.forEach(item => {
 			let errors:Array<string | undefined> = [];
 
-			if (item.required && !data[item.name]) {
-				errors.push(item.errors.required);
+			if (item.required && data[item.name] === undefined) {
+				errors.push(item.errors.required || ERRORS.DEFAULT_INPUT_ERROR);
 			}
 
-			if (item.type) {
-				if (!TYPES[item.type].test(data[item.name])) {
-					errors.push(item.errors.type);
+			if (item.reg !== undefined) {
+				if (!REGEX[item.reg].test(data[item.name])) {
+					errors.push(item.errors.reg || ERRORS.DEFAULT_INPUT_ERROR);
 				}
 			}
 
-			if (item.length) {
+			if (item.type !== undefined) {
+				if (!((typeof data[item.name]) === item.type)) {
+					errors.push(item.errors.type || ERRORS.DEFAULT_INPUT_ERROR);
+				}
+			}
+
+			if (item.length !== undefined) {
 				if (data[item.name].length < item.length.min || data[item.name].length > item.length.max) {
-					errors.push(item.errors.length);
+					errors.push(item.errors.length || ERRORS.DEFAULT_INPUT_ERROR);
 				}
 			}
 
-			if (!errors.empty()) {
-				this.fails.push({ name: item.name, errors: errors });
+			if (errors.length !== 0) {
+				let er = {};
+				er[item.name] = errors;
+				this.fails.push(er);
 			}
 		});
 
-		return this.fails.empty();
+		return this.fails.length == 0;
 	}
 
 	public getErrors():Array<object> {

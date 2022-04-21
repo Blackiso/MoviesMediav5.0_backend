@@ -1,4 +1,4 @@
-import { injectable } from 'tsyringe';
+import { injectable, inject, delay } from 'tsyringe';
 import { MysqlDatabase } from '@Lib/Mysql/index';
 import { BaseModel } from './BaseModel.model';
 import { timePlus } from '@Helpers/index';
@@ -13,11 +13,11 @@ export interface User {
 }
 
 @injectable()
-export class UserModel extends BaseModel {
+export class UserModel extends BaseModel<User> {
 
 	protected keys:string[] = [ 'id', 'username', 'email', 'password', 'profile_image' ];
 
-	constructor(db:MysqlDatabase) {
+	constructor(@inject(delay(() => MysqlDatabase)) db:MysqlDatabase) {
 		super(db, 'users');
 	}
 

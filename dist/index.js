@@ -14,21 +14,21 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
     __setModuleDefault(result, mod);
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 require("module-alias/register");
-const ApiServer_1 = require("./ApiServer");
+const Application_1 = require("./Application");
 const http = __importStar(require("http"));
 const logger_1 = require("@overnightjs/logger");
 require("reflect-metadata");
 const PORT = 8080;
-const apiServer = new ApiServer_1.ApiServer();
-const httpServer = http.createServer(apiServer.express);
-apiServer.init();
-httpServer.listen(PORT, () => {
-    logger_1.Logger.Info('Server started listening on port ' + PORT);
-});
-//# sourceMappingURL=index.js.map
+const SERVER = new Application_1.Application();
+SERVER.init((express => {
+    const HTTP_SERVER = http.createServer(SERVER.express);
+    HTTP_SERVER.listen(PORT, () => {
+        logger_1.Logger.Info('Server started listening on port ' + PORT);
+    });
+}));

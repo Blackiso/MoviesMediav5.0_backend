@@ -8,30 +8,40 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserModel = void 0;
 const tsyringe_1 = require("tsyringe");
-const index_1 = require("@Lib/index");
+const index_1 = require("../Lib/Mysql/index");
 const BaseModel_model_1 = require("./BaseModel.model");
-let UserModel = (() => {
-    let UserModel = class UserModel extends BaseModel_model_1.BaseModel {
-        constructor(db) {
-            super(db, 'users');
-            this.keys = ['id', 'username', 'email', 'password', 'profile_image'];
-        }
-        get() {
-            this.db.select(['id', 'username'])
-                .where('id', 'black')
-                .where('x >', 5)
-                .execute();
-            return 'yay';
-        }
-    };
-    UserModel = __decorate([
-        tsyringe_1.injectable(),
-        __metadata("design:paramtypes", [index_1.MysqlDatabase])
-    ], UserModel);
-    return UserModel;
-})();
+const index_2 = require("../Helpers/index");
+let UserModel = class UserModel extends BaseModel_model_1.BaseModel {
+    constructor(db) {
+        super(db, 'users');
+        this.keys = ['id', 'username', 'email', 'password', 'profile_image'];
+    }
+    addTokenId(user, tokenId) {
+        return this.db.insert(['user_id', 'token_id', 'expires'], {
+            user_id: user.id,
+            token_id: tokenId,
+            expires: index_2.timePlus(10080)
+        }, 'tokens').execute();
+    }
+    removeTokenId(user, tokenId) {
+        return this.db.delete('tokens')
+            .where('user_id', user.id)
+            .where('token_id', tokenId)
+            .execute();
+    }
+    getUser(id) {
+        return this.find(id);
+    }
+};
+UserModel = __decorate([
+    tsyringe_1.injectable(),
+    __param(0, tsyringe_1.inject(tsyringe_1.delay(() => index_1.MysqlDatabase))),
+    __metadata("design:paramtypes", [index_1.MysqlDatabase])
+], UserModel);
 exports.UserModel = UserModel;
-//# sourceMappingURL=User.model.js.map

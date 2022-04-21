@@ -1,47 +1,52 @@
 import { singleton } from 'tsyringe';
-import { Database } from '@Interfaces/Database.interface';
 import { MysqlResult } from './MysqlResult';
 import { Logger } from '@overnightjs/logger';
 import * as mysql from 'mysql';
+import { MYSQL } from '@Config/index';
 
 @singleton()
-export class MysqlDatabase implements Database {
+export class MysqlDatabase {
 	
 	private table_qr:string;
 	private where_qr:string[] = [];
 	private main_query:string;
 	private connection:any;
 
+	private reconnect_attemts:number = 0;
+	private max_reconnect_attemts:number = 5;
+	private reconnect_interval:number = 15000;
+
 	private allowedOperations = ['=', '>', '<', 'LIKE', '!='];
 
 	constructor() {
-		this.connection = mysql.createConnection({
-			host     : '127.0.0.1',
-			user     : 'root',
-			password : 'root',
-			database : 'moviesmedia_database'
+		this.connection = mysql.createPool({
+			connectionLimit : 2,
+			host            : MYSQL.host,
+			user            : MYSQL.user,
+			password        : MYSQL.password,
+			database        : MYSQL.database
 		});
 
-		this.connection.connect((err) => {
-			if (err) {
-				Logger.Err(err);
-				return;
-			}
-
-			Logger.Info('connected as id ' + this.connection.threadId);
-		});
+		this.connection.on('error', this.handleErrors.bind(this));
 	}
 
-	set table(name) {
+	private handleErrors(err) {
+		console.log(err.code);
+	}
+
+	public table(name):MysqlDatabase {
 		this.table_qr = name;
+		return this;
 	}
 
-	private query(statement):Promise<MysqlResult> {
+	public query(statement):Promise<MysqlResult> {
 		Logger.Imp(statement);
 		
 		return new Promise((res, rej) => {
 			this.connection.query(statement, (err, result, fields) => {
-				if (err) rej(err);
+				if (err) {
+					rej(err);
+				}
 				res(new MysqlResult(result, fields));
 			});
 		});
@@ -93,6 +98,35 @@ export class MysqlDatabase implements Database {
 	public delete(table?:string):MysqlDatabase {
 		table = table ? table : this.table_qr;
 		this.main_query = 'DELETE FROM '+ table;
+		return this;
+	}
+
+	public replace(keys:string[], data:object, to_update:string[], table?:string):MysqlDatabase {
+		table = table || this.table_qr;
+		this.insert(keys, data, table);
+
+		this.main_query += ' ON DUPLICATE KEY UPDATE ';
+		let update:string[] = [];
+
+		to_update.forEach(item => {
+			let value = item +" = ";
+			if(typeof data[item] === 'string') {
+				value += "'"+data[item]+"'";
+			}else {
+				value += data[item];
+			}
+			update.push(value);
+		});
+
+		this.main_query += update.join(', ');
+
+		return this;
+	}
+
+	public whereMultiple(conditions:Object):MysqlDatabase {
+		for (let key in conditions) {
+			this.where(key, conditions[key]);
+		}
 		return this;
 	}
 

@@ -1,5 +1,5 @@
 import { injectable, singleton } from 'tsyringe';
-import { UserModel } from '@Models/index';
+import { User, UserModel } from '@Models/index';
 import { JWT } from '@Lib/index';
 import { randomeId, timePlus } from '@Helpers/index';
 
@@ -7,6 +7,8 @@ import { randomeId, timePlus } from '@Helpers/index';
 @injectable()
 export class AuthenticationService {
 	
+	private user:User;
+
 	constructor(private userModel:UserModel) {}
 
 	public async authenticate(user:any):Promise<any> {
@@ -32,6 +34,18 @@ export class AuthenticationService {
 
 	public revokeToken(userId:string, tokenId:string):void {
 		this.userModel.removeTokenId(userId, tokenId);
+	}
+
+	public setUser(user:User) {
+		this.user = user;
+	}
+
+	public getUser():User {
+		return this.user;
+	}
+
+	public isAuth():boolean {
+		return this.user !== undefined;
 	}
 
 }

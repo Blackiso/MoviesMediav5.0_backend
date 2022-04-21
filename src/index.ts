@@ -1,13 +1,14 @@
 import 'module-alias/register';
-import { ApiServer } from './ApiServer';
+import { Application } from './Application';
 import * as http from 'http';
-import { container } from "tsyringe";
 import { Logger } from '@overnightjs/logger';
 import "reflect-metadata";
 import { User } from '@Models/index';
 
 declare global {
+	
 	namespace Express {
+
 		interface Response {
 			ok(data:any):void;
 			error(data:any, code?:number):void;
@@ -17,23 +18,18 @@ declare global {
 			jwt:string | null;
 			user:User;
 		}
+			
 	}
 
-	interface Array<T> {
-        empty():boolean;
-    }
-}
-
-Array.prototype.empty = function () {
-    return this.length == 0;
 }
 
 const PORT = 8080;
-const apiServer = new ApiServer();
-const httpServer = http.createServer(apiServer.express);
+const SERVER = new Application();
+SERVER.init((express => {
+	const HTTP_SERVER = http.createServer(SERVER.express);
+	HTTP_SERVER.listen(PORT, () => {
+		Logger.Info('Server started listening on port '+PORT);
+	});
+}));
 
-apiServer.init();
 
-httpServer.listen(PORT, () => {
-	Logger.Info('Server started listening on port '+PORT);
-});

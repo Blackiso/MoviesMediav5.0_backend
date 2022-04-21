@@ -42,7 +42,7 @@ export class JWT {
 		let currentTime = new Date().getTime();
 		if (this.body.exp < currentTime) {
 			Logger.Warn('Token expired!');
-			return false;
+			// return false;
 		}
 
 		return true;

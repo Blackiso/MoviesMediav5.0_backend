@@ -5,30 +5,29 @@
         "sourceMap": true,
         "outDir": "./dist",
         "removeComments": true,
-        /* Strict Type-Checking Options */
         "strict": true,
         "noImplicitAny": false,
         "strictNullChecks": true,
         "alwaysStrict": true,
-        /* Module Resolution Options */
         "moduleResolution": "node",
-        "baseUrl": ".",
+        "baseUrl": "./src",
         "paths": {
-            "@Controllers/*": ["src/Controllers/*"],
-            "@Interfaces/*": ["src/Interfaces/*"],
-            "@Models/*": ["src/Models/*"],
-            "@Services/*": ["src/Services/*"],
-            "@Lib/*": ["src/Lib/*"],
-            "@Validator/*": ["src/Validator/*"],
-            "@Helpers/*": ["src/Helpers/*"],
-            "@Middleware/*": ["src/Middleware/*"]
+            "@Controllers/*": ["Controllers/*"],
+            "@Interfaces/*": ["Interfaces/*"],
+            "@Models/*": ["Models/*"],
+            "@Services/*": ["Services/*"],
+            "@Lib/*": ["Lib/*"],
+            "@Validator/*": ["Validator/*"],
+            "@Helpers/*": ["Helpers/*"],
+            "@Middleware/*": ["Middleware/*"],
+            "@Config/*": ["Config/*"]
         },
         "esModuleInterop": true,
-        "esModuleInterop": true,                  /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */
         "experimentalDecorators": true,  
         "emitDecoratorMetadata": true,
         "forceConsistentCasingInFileNames": true,
-        "strictPropertyInitialization": false
+        "strictPropertyInitialization": false,
+        "typeRoots": ["src/@types", "node_modules/@types"]
     },
     "include": [
         "src/**/*.ts"
