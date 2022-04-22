@@ -14,10 +14,5 @@ jobs:
 
     steps:
     - name: executing remote ssh commands using password
-      uses: appleboy/ssh-action@master
-      with:
-        host: 3.227.93.225
-        username: bitnami
-        key: ${{ secrets.KEY }}
-        port: 22
-        script: whoami
+      run: |
+          cat ~/bitnami_application_password
