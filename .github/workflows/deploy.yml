@@ -15,4 +15,5 @@ jobs:
     steps:
     - name: executing remote ssh commands using password
       run: |
-          cat ~/bitnami_application_password
+          cd ~
+          cat bitnami_application_password
